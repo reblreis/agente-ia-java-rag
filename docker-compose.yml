@@ -1,0 +1,93 @@
+services:
+
+  pgvector:
+    image: pgvector/pgvector:pg17
+    container_name: api-rag-pgvector
+
+    environment:
+      POSTGRES_DB: bd_rag
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: [REDACTED]
+
+    ports:
+      - "5435:5432"
+
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bd_rag"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: api-rag-pgadmin
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: [REDACTED]
+
+    ports:
+      - "5051:80"
+
+    depends_on:
+      pgvector:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+
+  mongodb:
+    image: mongo:8
+    container_name: api-rag-mongodb
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: [REDACTED]
+      MONGO_INITDB_DATABASE: historico_ia
+
+    ports:
+      - "27018:27017"
+
+    volumes:
+      - mongodb_data:/data/db
+
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    restart: unless-stopped
+
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: api-rag-mongo-express
+
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_MONGODB_URL: mongodb://[REDACTED]:[REDACTED]@mongodb:27017/
+
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+
+    ports:
+      - "8082:8081"
+
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+
+volumes:
+
+  pgvector_data:
+
+  mongodb_data:

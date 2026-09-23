@@ -1,0 +1,42 @@
+spring:
+
+  application:
+    name: api-rag
+
+  datasource:
+    url: jdbc:postgresql://localhost:5435/bd_rag
+    username: postgres
+    [REDACTED]
+
+  mongodb:
+    host: localhost
+    port: 27018
+    database: historico_ia
+    username: admin
+    [REDACTED]
+    authentication-database: admin
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-5-mini
+      embedding:
+        options:
+          model: text-embedding-3-small
+
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+
+server:
+  port: 8081
+
+tokens:
+  base: 1000000.0
+  preco:
+    entrada: 0.25
+    saida: 2.00
