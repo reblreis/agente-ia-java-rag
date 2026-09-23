@@ -5,15 +5,15 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5435/bd_rag
-    username: postgres
-    [REDACTED]
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
 
   mongodb:
     host: localhost
     port: 27018
     database: historico_ia
-    username: admin
-    [REDACTED]
+    username: ${MONGO_USER}
+    password: ${MONGO_PASSWORD}
     authentication-database: admin
 
   ai:
